@@ -7,7 +7,7 @@ import scipy.interpolate as interp
 RHO = 1000
 GRAV = 9.81
 
-# setup grids for X = [0, 150,000] km, Z = [0, 500] m
+# setup grids for X = [0, 150,000] m, Z = [0, 500] m
 x_grid = np.linspace(0, 1.5e5, 1000)
 z_grid = np.linspace(0, 500, 500)
 
@@ -17,12 +17,12 @@ density = (
 )
 
 # want to interpolate from 50 grid points on this domain
-xi_subset = list(range(0, len(x_grid), 20)) + [len(x_grid) - 1]
+x_subset = list(range(0, len(x_grid), 20)) + [len(x_grid) - 1]
 
 # this is the approximate shelf floor
 bathymetry = z_grid[-1] - x_grid * 2e-3
 plt.plot(
-    x_grid[xi_subset]/1000, bathymetry[xi_subset], "o",
+    x_grid[x_subset]/1000, bathymetry[x_subset], "o",
     x_grid/1000, bathymetry, "-"
 )
 plt.ylim(500, 0)
@@ -32,16 +32,17 @@ plt.show()
 
 # initialize things
 phi0_grad = None
-c = np.zeros(len(xi_subset))
-r01 = np.zeros(len(xi_subset))
-r10 = np.zeros(len(xi_subset))
-q = np.zeros(len(xi_subset))
+c = np.zeros(len(x_subset))
+r01 = np.zeros(len(x_subset))
+r10 = np.zeros(len(x_subset))
+q = np.zeros(len(x_subset))
 
-for i in range(len(xi_subset)):
+for i in range(len(x_subset)):
     # select the z-grid of interest
-    z_grid_temp = z_grid[z_grid <= bathymetry[xi_subset[i]]]
+    z_grid_temp = z_grid[z_grid <= bathymetry[x_subset[i]]]
     dz = z_grid_temp[1] - z_grid_temp[0]
     n_z = len(z_grid_temp)
+    # make sure we are getting enough points in our domain
     print(n_z)
 
     # compute the density on the z-grid
@@ -84,28 +85,28 @@ for i in range(len(xi_subset)):
     )
 
 # interpolate out the other parameters, from the grid
-f_c = interp.interp1d(x_grid[xi_subset], c)
-f_r01 = interp.interp1d(x_grid[xi_subset], r01)
-f_r10 = interp.interp1d(x_grid[xi_subset], r10)
-f_q = interp.interp1d(x_grid[xi_subset], q)
+f_c = interp.interp1d(x_grid[x_subset], c)
+f_r01 = interp.interp1d(x_grid[x_subset], r01)
+f_r10 = interp.interp1d(x_grid[x_subset], r10)
+f_q = interp.interp1d(x_grid[x_subset], q)
 
 plt.subplot(221)
-plt.plot(x_grid[xi_subset]/1000, c, "o")
+plt.plot(x_grid[x_subset]/1000, c, "o")
 plt.plot(x_grid/1000, f_c(x_grid))
 plt.title("$c$ parameter")
 
 plt.subplot(222)
-plt.plot(x_grid[xi_subset]/1000, q, "o")
+plt.plot(x_grid[x_subset]/1000, q, "o")
 plt.plot(x_grid/1000, f_q(x_grid))
 plt.title("$q$ parameter")
 
 plt.subplot(223)
-plt.plot(x_grid[xi_subset]/1000, r01, "o")
+plt.plot(x_grid[x_subset]/1000, r01, "o")
 plt.plot(x_grid/1000, f_r01(x_grid))
 plt.title("$r_{01}$ parameter")
 
 plt.subplot(224)
-plt.plot(x_grid[xi_subset]/1000, r10, "o")
+plt.plot(x_grid[x_subset]/1000, r10, "o")
 plt.plot(x_grid/1000, f_r10(x_grid))
 plt.title("$r_{10}$ parameter")
 plt.show()
