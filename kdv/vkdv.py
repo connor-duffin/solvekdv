@@ -16,6 +16,7 @@ class Kdv(object):
         self.u0 = np.zeros(self.n_x)
         self.u1 = np.zeros(self.n_x)
         self.u2 = np.zeros(self.n_x)
+        self.q = np.zeros(self.n_x)
         self.a = 0
         self.b = 0
         self.c = 0
