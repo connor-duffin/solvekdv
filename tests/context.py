@@ -5,4 +5,6 @@ sys.path.insert(
 )
 
 import kdv
+import vkdv
 import vert
+import vvert
