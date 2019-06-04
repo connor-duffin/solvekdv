@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import scipy.sparse as sparse
 
@@ -12,7 +14,6 @@ class VerticalMode(object):
         self.z_grid = np.arange(start_z, end_z, dz)
         self.n_z = len(self.z_grid)
         self.rho_0 = rho_0
-
         self.density = None
         self.grad_density = None
         self.phi = None
@@ -24,7 +25,15 @@ class VerticalMode(object):
 
     def compute_density(self, density="sech"):
         z_grid = self.z_grid
-        if density == "lamb-yan-1":
+        if (
+            isinstance(density, np.ndarray)
+            and (
+                density.shape == (self.n_z, )
+                or density.shape == (self.n_z, 1)
+            )
+        ):
+            self.density = density
+        elif density == "lamb-yan-1":
             self.density = (
                 1027.31 - 3.3955 * np.exp((z_grid - 300) / 50)
             )
@@ -35,10 +44,12 @@ class VerticalMode(object):
             )
         elif density == "tanh":
             self.density = (
-                (np.exp(z_grid) - np.exp(-z_grid)) / (np.exp(z_grid) + np.exp(-z_grid))
+                (np.exp(z_grid) - np.exp(-z_grid))
+                / (np.exp(z_grid) + np.exp(-z_grid))
             )
         else:
-            print("Please try another density form (e.g. 'lamb-yan-1'")
+            logging.INFO("Please try another density (e.g. 'lamb-yan-1')")
+            logging.ERROR("Density not initialized")
         self.grad_density = np.gradient(self.density, self.dz)
 
     def find_vertical_mode(self):
@@ -88,10 +99,9 @@ class VerticalMode(object):
         self.c = np.sqrt(1 / eigenvalue[0])
 
     def compute_r10(self):
-        phi = self.phi
         phi_grad = self.phi_grad
         self.r10 = (
-            (3 / 2) * (np.trapz(np.power(phi, 3), dx=self.dz)
+            (3 / 2) * (np.trapz(np.power(phi_grad, 3), dx=self.dz)
             / np.trapz(np.power(phi_grad, 2), dx=self.dz))
         )
 

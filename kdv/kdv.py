@@ -18,6 +18,7 @@ class Kdv(object):
         self.u2 = np.zeros(self.n_x)
         self.a = 0
         self.b = 0
+        self.c = 0
 
         self.first_order_matrix = np.zeros([self.n_x, self.n_x])
         self.third_order_matrix = np.zeros([self.n_x, self.n_x])
@@ -28,8 +29,8 @@ class Kdv(object):
         self.u1[:] = initial
         self.u2[:] = initial
 
-    def set_kdv_parameters(self, a=1, b=0.022**2):
-        self.a, self.b = a, b
+    def set_kdv_parameters(self, a, b, c):
+        self.a, self.b, self.c = a, b, c
 
     def set_first_order_matrix(self):
         dx, n_x = self.dx, self.n_x
@@ -64,18 +65,22 @@ class Kdv(object):
         self.third_order_matrix = output
 
     def set_lhs_matrix(self):
-        output = (sparse.identity(self.n_x, format="csr")
-                  + self.b * (3 * self.dt / 4) * self.third_order_matrix)
+        output = (
+            sparse.identity(self.n_x, format="csr")
+            + self.b * (3 * self.dt / 4) * self.third_order_matrix
+            + self.c * (3 * self.dt / 4) * self.first_order_matrix
+        )
         self.lhs_matrix = output
 
     def solve_step(self):
-        a, b, dt = self.a, self.b, self.dt
+        a, b, c, dt = self.a, self.b, self.c, self.dt
         rhs_vector = (
             self.u0
             - a * (7 * dt / 4) * self.u0 * (self.first_order_matrix @ self.u0)
             + a * dt * self.u1 * (self.first_order_matrix @ self.u1)
             - a * (dt / 4) * self.u2 * (self.first_order_matrix @ self.u2)
             - b * (dt / 4) * self.third_order_matrix @ self.u1
+            - c * (dt / 4) * self.first_order_matrix @ self.u1
         )
         output = spsolve(self.lhs_matrix, rhs_vector)
         self.u2[:] = self.u1
