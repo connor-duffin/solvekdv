@@ -129,7 +129,7 @@ class VVerticalMode(object):
                 / (c_temp[i]**3 * np.trapz(np.power(phi_grad, 2), dx=dz))
             )
 
-        # interpolate out the other parameters, from the grid
+        # interpolate out the other parameters from the grid
         f_c = interp1d(x_grid[x_subset], c_temp)
         f_r01 = interp1d(x_grid[x_subset], r01_temp)
         f_r10 = interp1d(x_grid[x_subset], r10_temp)
