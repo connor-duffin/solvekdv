@@ -1,11 +1,9 @@
 import logging
 
 import numpy as np
-import scipy.sparse as sparse
 
 from scipy.interpolate import interp1d
 from scipy.linalg import eigh
-from scipy.sparse.linalg import eigs
 
 
 class VVerticalMode(object):
@@ -33,6 +31,7 @@ class VVerticalMode(object):
         self.r10 = np.zeros((self.n_x, 1))
         self.r01 = np.zeros((self.n_x, 1))
         self.q = np.zeros((self.n_x, 1))
+        self.q_grad = np.zeros((self.n_x, 1))
 
     def compute_bathymetry(self, ocean_floor):
         self.bathymetry = self.z_grid[-1] - ocean_floor
@@ -66,7 +65,6 @@ class VVerticalMode(object):
             logging.ERROR("Density not initialized")
         self.density_grad = np.gradient(self.density, self.dz0)
 
-    ########################################
     def compute_parameters(self):
         dz = self.dz0
         rho_0 = self.rho_0
@@ -99,9 +97,10 @@ class VVerticalMode(object):
                 + np.diag(np.full(n_z, -2), k=0)
                 + np.diag(np.full(n_z - 1, 1), k=1)
             )
-            scale = np.diag(np.full(n_z, (- 9.81 / rho_0) * density_grad_temp))
+            scale = np.diag(
+                np.full(n_z, (- 9.81 / rho_0) * density_grad_temp)
+            )
 
-            # eigh faster than any sparse stuff
             eigenvalue, phi = eigh(
                 second_diff_temp, b=scale, eigvals=(0, 0)
             )
@@ -111,6 +110,8 @@ class VVerticalMode(object):
 
             # set the initial element (to be used in computing Q)
             if (i == 0):
+                self.phi0 = phi
+                self.phi0_grad = phi_grad
                 phi0_grad = phi_grad
 
             # compute c, r10, r01, Q
@@ -138,43 +139,4 @@ class VVerticalMode(object):
         self.r01 = f_r01(x_grid)
         self.r10 = f_r10(x_grid)
         self.q = f_q(x_grid)
-
-    def find_vertical_mode_sparse(self):
-        dz = self.dz
-        n_z = self.n_z
-        rho_0 = self.rho_0
-        density_grad = self.density_grad
-
-        second_diff = - 1 / (dz**2) * sparse.diags(
-            diagonals=[
-                np.full(n_z - 1, 1),
-                np.full(n_z, -2),
-                np.full(n_z - 1, 1)
-            ],
-            offsets=[-1, 0, 1],
-            format="csc"
-        )
-        scale = sparse.diags(
-            np.full(n_z, (9.81 / rho_0) * density_grad), 0, format="csc"
-        )
-
-        eigenvalue, phi = eigs(second_diff, b=scale, k=1, which="LM")
-        self.phi = np.ndarray.flatten(phi)
-        self.phi /= np.max(self.phi)
-        self.phi_grad = np.gradient(self.phi, self.dz)
-        self.c = np.sqrt(1 / eigenvalue[0])
-
-    def compute_r10(self):
-        phi_grad = self.phi_grad
-        self.r10 = (
-            (3 / 2) * (np.trapz(np.power(phi_grad, 3), dx=self.dz)
-            / np.trapz(np.power(phi_grad, 2), dx=self.dz))
-        )
-
-    def compute_r01(self):
-        phi = self.phi
-        phi_grad = self.phi_grad
-        self.r01 = (
-            (self.c / 2) * (np.trapz(np.power(phi, 2), dx=self.dz)
-            / np.trapz(np.power(phi_grad, 2), dx=self.dz))
-        )
+        self.q_grad = np.gradient(self.q)
