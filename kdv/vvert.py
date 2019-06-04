@@ -9,19 +9,25 @@ from scipy.sparse.linalg import eigs
 
 class VerticalMode(object):
 
-    def __init__(self, dz, start_z, end_z, rho_0):
+    def __init__(self, dx, start_x, end_x, dz, start_z, end_z, rho_0):
         self.dz = dz
         self.z_grid = np.arange(start_z, end_z, dz)
         self.n_z = len(self.z_grid)
+        self.dx = dz
+        self.x_grid = np.arange(start_z, end_z, dz)
+        self.n_x = len(self.z_grid)
+
         self.rho_0 = rho_0
+
         self.density = None
         self.grad_density = None
-        self.phi = None
-        self.phi_grad = None
-        self.c = None
 
-        self.r10 = None
-        self.r01 = None
+        self.phi = np.zeros((self.n_x, self.n_z))
+        self.phi_grad = np.zeros((self.n_x, self.n_z))
+        self.c = np.zeros((self.n_x, 1))
+
+        self.r10 = np.zeros((self.n_x, 1))
+        self.r01 = np.zeros((self.n_x, 1))
 
     def compute_density(self, density="sech"):
         z_grid = self.z_grid
@@ -52,9 +58,11 @@ class VerticalMode(object):
             logging.ERROR("Density not initialized")
         self.grad_density = np.gradient(self.density, self.dz)
 
-    def find_vertical_mode(self):
+    def find_vertical_modes(self):
         dz = self.dz
         n_z = self.n_z
+        dx = self.dx
+        n_x = self.n_x
         rho_0 = self.rho_0
         grad_density = self.grad_density
 
