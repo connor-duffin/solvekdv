@@ -31,8 +31,8 @@ test = kdv.Kdv(
     start_t=0, end_t=24 * 60**2
 )
 test.set_initial_condition(
-    - 20 * (1/4) * (1 + np.tanh((test.x_grid + 20000) / 2000))
-    * (1 - np.tanh(test.x_grid / 2000))
+    np.array(- 20 * (1/4) * (1 + np.tanh((test.x_grid + 20000) / 2000))
+    * (1 - np.tanh(test.x_grid / 2000)), ndmin=2).T
 )
 test.set_kdv_parameters(
     a=vertical.alpha,
@@ -60,4 +60,10 @@ plt.ylabel("t")
 plt.title(
     "KdV, ($a$, $b$, $c$)=(%g, %g, %g)" % (test.a, test.b, test.c)
 )
+plt.show()
+
+
+plt.plot(test.x_grid, u[:, 1000])
+plt.plot(test.x_grid, u[:, 2000])
+plt.plot(test.x_grid, u[:, 3000])
 plt.show()
