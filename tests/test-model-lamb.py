@@ -14,33 +14,29 @@ from context import vert
 
 
 # solve the vertical mode problem
-vertical = vert.VerticalMode(0.1, 0, 300, 1000)
+vertical = vert.VerticalMode(0.1, 0, 500, 1000)
 vertical.compute_density("lamb-yan-1")
 vertical.find_vertical_mode()
-vertical.compute_r10()
-vertical.compute_r01()
+vertical.compute_alpha()
+vertical.compute_beta()
 print(
-    (f"r10: {vertical.r10:.4f}\n"
-    + f"r01: {vertical.r01:.4f}\n"
-    + f"c:   {vertical.c:.4f}\n")
+    f"alpha: {vertical.alpha:.4f}\n"
+    + f"beta: {vertical.beta:.4f}\n"
+    + f"c:   {vertical.c:.4f}\n"
 )
 
 # set simulation vars, initial conditions, and parameters
 test = kdv.Kdv(
-    dt=10,
-    dx=50,
-    start_x=-150000,
-    end_x=150000,
-    start_t=0,
-    end_t=24 * 60**2
+    dt=10, dx=50, start_x=-150000, end_x=150000,
+    start_t=0, end_t=24 * 60**2
 )
 test.set_initial_condition(
-    - 20 * (1/4) * ((1 + np.tanh((test.x_grid + 20000) / 2000))
-    * (1 - np.tanh(test.x_grid / 2000)))
+    - 20 * (1/4) * (1 + np.tanh((test.x_grid + 20000) / 2000))
+    * (1 - np.tanh(test.x_grid / 2000))
 )
 test.set_kdv_parameters(
-    a=2 * vertical.r10 * vertical.c,
-    b=vertical.r01,
+    a=vertical.alpha,
+    b=vertical.beta,
     c=vertical.c
 )
 test.set_first_order_matrix()

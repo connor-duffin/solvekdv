@@ -15,18 +15,13 @@ vertical.compute_r10()
 vertical.compute_r01()
 
 print(
-    (f"r10: {vertical.r10:.4f}\n"
+    f"r10: {vertical.r10:.4f}\n"
     + f"r01: {vertical.r01:.4f}\n"
-    + f"c:   {vertical.c:.4f}\n")
+    + f"c:   {vertical.c:.4f}\n"
 )
 
 test = kdv.Kdv(
-    dt=10,
-    dx=50,
-    start_x=-150000,
-    end_x=150000,
-    start_t=0,
-    end_t=24 * 60**2
+    dt=10, dx=50, start_x=-150000, end_x=150000, start_t=0, end_t=24 * 60**2
 )
 
 test.set_initial_condition(

@@ -13,19 +13,35 @@ vertical_test.compute_density("lamb-yan-1")
 vertical_test.compute_parameters()
 
 x_grid = vertical_test.x_grid
+x_subs_index = vertical_test.x_subs_index
 plt.subplot(221)
-plt.plot(x_grid/1000, vertical_test.c)
+plt.plot(
+    x_grid[x_subs_index]/1000, vertical_test.c[x_subs_index], "o",
+    x_grid/1000, vertical_test.c, "-"
+)
 plt.title("$c$ parameter")
 
 plt.subplot(222)
-plt.plot(x_grid/1000, vertical_test.q)
+plt.plot(
+    x_grid[x_subs_index]/1000, vertical_test.q[x_subs_index], "o",
+    x_grid/1000, vertical_test.q, "-"
+)
 plt.title("$q$ parameter")
 
 plt.subplot(223)
-plt.plot(x_grid/1000, vertical_test.r01)
+plt.plot(
+    x_grid[x_subs_index]/1000, vertical_test.r01[x_subs_index], "o",
+    x_grid/1000, vertical_test.r01, "-",
+)
 plt.title("$r_{01}$ parameter")
 
 plt.subplot(224)
-plt.plot(x_grid/1000, vertical_test.r10)
+plt.plot(
+    x_grid[x_subs_index]/1000, vertical_test.r10[x_subs_index], "o",
+    x_grid/1000, vertical_test.r10, "-"
+)
 plt.title("$r_{10}$ parameter")
+plt.show()
+
+plt.plot((vertical_test.c / vertical_test.q) * vertical_test.q_grad)
 plt.show()

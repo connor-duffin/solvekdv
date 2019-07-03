@@ -37,6 +37,6 @@ def animate(i):
 
 
 anim = animation.FuncAnimation(
-    fig, animate, init_func=init, frames=20000, interval=2, blit=True
+    fig, animate, init_func=init, frames=20000, interval=1, blit=True
 )
-animation.Animation.save(filename="zabusky.mp4")
+plt.show()
