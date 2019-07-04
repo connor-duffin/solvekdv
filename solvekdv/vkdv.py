@@ -85,33 +85,6 @@ class Kdv(object):
         )
         self.lhs_matrix = output
 
-    def set_solve_matrices(self):
-        self.bathymetry_term = (2 * self.c / self.q) * self.q_grad
-#         self.a_first_order_matrix = (self.first_order_matrix.T * self.a).T
-#         self.b_third_order_matrix = (self.third_order_matrix.T * self.b).T
-#         self.c_first_order_matrix = (self.first_order_matrix.T * self.c).T
-#
-#     is a diag matrix for each parameter really necessary???
-#     would work the exact same if there was just an element-wise mult.
-#     tomorrow: check dimensions on these so that they line up correctly.
-#
-#     def solve_step(self):
-#         dt = self.dt
-#         rhs_vector = (
-#             self.u0
-#             - (7 * dt / 4) * self.a * self.u0 * (self.a_first_order_matrix @ self.u0)
-#             + dt * self.u1 * (self.a_first_order_matrix @ self.u1)
-#             - (dt / 4) * self.u2 * (self.a_first_order_matrix @ self.u2)
-#             + (dt / 4) * (self.c_first_order_matrix) @ self.u1
-#             + (dt / 4) * (self.b_third_order_matrix) @ self.u1
-#             - (dt / 4) * self.bathymetry_term * self.u1
-#         )
-#         output = spla.spsolve(self.lhs_matrix, rhs_vector)
-#         self.u2 = self.u1.copy()
-#         self.u1 = self.u0.copy()
-#         self.u0 = output.reshape(self.n_x, 1).copy()
-#         return(output)
-
     def solve_step(self):
         dt = self.dt
         rhs_vector = (
