@@ -3,13 +3,12 @@ import scipy.sparse as sparse
 import scipy.sparse.linalg as spla
 
 
-# shape of u is incorrect
 class Kdv(object):
     def __init__(self, dt, dx, start_x, end_x, start_t, end_t):
         self.dt = dt
         self.dx = dx
-        self.x_grid = np.arange(start_x, end_x, dx)
-        self.t_grid = np.arange(start_t, end_t, dt)
+        self.x_grid = np.arange(start_x, end_x + dx, dx)
+        self.t_grid = np.arange(start_t, end_t + dt, dt)
         self.n_x = len(self.x_grid)
         self.n_t = len(self.t_grid)
         self.u0 = np.zeros((self.n_x, 1))
@@ -23,9 +22,9 @@ class Kdv(object):
         self.q = None
         self.q_grad = None
 
-        self.first_order_matrix = np.zeros([self.n_x, self.n_x])
-        self.third_order_matrix = np.zeros([self.n_x, self.n_x])
-        self.lhs_matrix = np.zeros([self.n_x, self.n_x])
+        self.first_order_matrix = np.zeros((self.n_x, self.n_x))
+        self.third_order_matrix = np.zeros((self.n_x, self.n_x))
+        self.lhs_matrix = np.zeros((self.n_x, self.n_x))
 
         self.a_first_order_matrix = None
         self.b_third_order_matrix = None

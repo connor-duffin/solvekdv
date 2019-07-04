@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import scipy.sparse as sparse
 import scipy.linalg as la
@@ -19,7 +21,7 @@ class VerticalMode(object):
         self.alpha = None
         self.beta = None
 
-    def compute_density(self, density="sech"):
+    def compute_density(self, density="tanh"):
         z_grid = self.z_grid
         if (
             isinstance(density, np.ndarray)
@@ -44,8 +46,8 @@ class VerticalMode(object):
                 / (np.exp(z_grid) + np.exp(-z_grid))
             )
         else:
-            print("Please try another density (e.g. 'lamb-yan-1')")
-            print("Density not initialized")
+            logging.error("Please try another density (e.g. 'lamb-yan-1')")
+            logging.error("Density not initialized")
         self.grad_density = np.gradient(self.density, self.dz)
 
     def find_vertical_mode(self):
