@@ -2,7 +2,7 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-from context import vvert_no_interp
+from context import vvert
 from context import vkdv
 
 
@@ -14,7 +14,7 @@ from context import vkdv
 # start_z0 = 0
 # end_z0 = 250 m
 # 200 eigenvalue points
-vert = vvert_no_interp.VVerticalMode(
+vert = vvert.VVerticalMode(
     dx=10, start_x=0, end_x=150_000, dz0=0.5, start_z0=0, end_z0=250,
     n_eigen=200, rho_0=1000
 )
