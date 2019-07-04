@@ -5,8 +5,8 @@ import scipy.linalg as la
 
 
 class VVerticalMode(object):
-    def __init__(self, dx, start_x, end_x, dz0, start_z0, end_z0, n_eigen,
-                 rho_0):
+    def __init__(self, dx, start_x, end_x, dz0, start_z0, end_z0,
+                 n_eigen, rho_0):
         self.dz0 = dz0
         self.z0_grid = np.arange(start_z0, end_z0, dz0)
         self.n_z0 = len(self.z0_grid)
@@ -34,9 +34,6 @@ class VVerticalMode(object):
         self.bathymetry = self.z0_grid[-1] - ocean_floor
 
     def compute_density(self, density="tanh"):
-        """ Compute densities using three predefined functions.
-        The function that you use is stored for compute_parameters()
-        """
         z0_grid = self.z0_grid
         if density == "lamb-yan-1":
             self.density = (
@@ -63,15 +60,10 @@ class VVerticalMode(object):
                 (np.exp(z) - np.exp(-z)) / (np.exp(z) + np.exp(-z))
             )
         else:
-            logging.INFO("Please try another density (e.g. 'lamb-yan-1')")
-            logging.ERROR("Density not initialized")
+            logging.ERROR("Density not initialized.")
         self.density_grad = np.gradient(self.density, self.dz0)
 
     def compute_parameters(self):
-        """ Compute parameters using the eigenvalue problem.
-        All parameters are saved as column vectors for appropriate matrix
-        multiplications.
-        """
         dz = self.dz0
         rho_0 = self.rho_0
         n_eigen = self.n_eigen
