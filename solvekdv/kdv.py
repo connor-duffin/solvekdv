@@ -84,4 +84,4 @@ class Kdv(object):
         self.u2 = self.u1.copy()
         self.u1 = self.u0.copy()
         self.u0 = output.reshape(self.n_x, 1).copy()
-        return output
+        return(output)

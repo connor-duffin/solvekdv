@@ -46,8 +46,7 @@ class VerticalMode(object):
                 / (np.exp(z_grid) + np.exp(-z_grid))
             )
         else:
-            logging.error("Please try another density (e.g. 'lamb-yan-1')")
-            logging.error("Density not initialized")
+            logging.ERROR("Density not initialized")
         self.grad_density = np.gradient(self.density, self.dz)
 
     def find_vertical_mode(self):
