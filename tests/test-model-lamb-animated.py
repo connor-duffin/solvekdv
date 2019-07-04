@@ -46,7 +46,7 @@ for i in range(test.n_t):
     u[:, i] = test.solve_step()
 
 fig = plt.figure()
-ax = plt.axes(xlim=(-150, 150), ylim=(-50, 10))
+ax = plt.axes(xlim=(0, 150), ylim=(-500, 10))
 line, = plt.plot([], [])
 
 

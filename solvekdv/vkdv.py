@@ -16,12 +16,12 @@ class Kdv(object):
         self.u1 = np.zeros((self.n_x, 1))
         self.u2 = np.zeros((self.n_x, 1))
 
-        self.a = 0
-        self.b = 0
-        self.c = 0
+        self.a = None
+        self.b = None
+        self.c = None
 
-        self.q = np.zeros(self.n_x)
-        self.q_grad = np.zeros(self.n_x)
+        self.q = None
+        self.q_grad = None
 
         self.first_order_matrix = np.zeros([self.n_x, self.n_x])
         self.third_order_matrix = np.zeros([self.n_x, self.n_x])
@@ -77,34 +77,50 @@ class Kdv(object):
         output = (
             sparse.diags(diag, format="csr")
             + (3 * dt / 4) * (
-                sparse.diags(self.c, format="csr") @ self.first_order_matrix
+                self.first_order_matrix.multiply(self.c)
             )
             + (3 * dt / 4) * (
-                sparse.diags(self.b, format="csr") @ self.third_order_matrix
+                self.third_order_matrix.multiply(self.b)
             )
         )
         self.lhs_matrix = output
 
     def set_solve_matrices(self):
-        self.a_first_order_matrix = (self.first_order_matrix.T * self.a).T
-        self.b_third_order_matrix = (self.third_order_matrix.T * self.b).T
-        self.c_first_order_matrix = (self.first_order_matrix.T * self.c).T
-        self.bathymetry_term = np.array(
-            (self.c / self.q) * self.q_grad, ndmin=2
-        ).T
+        self.bathymetry_term = (2 * self.c / self.q) * self.q_grad
+#         self.a_first_order_matrix = (self.first_order_matrix.T * self.a).T
+#         self.b_third_order_matrix = (self.third_order_matrix.T * self.b).T
+#         self.c_first_order_matrix = (self.first_order_matrix.T * self.c).T
+#
+#     is a diag matrix for each parameter really necessary???
+#     would work the exact same if there was just an element-wise mult.
+#     tomorrow: check dimensions on these so that they line up correctly.
+#
+#     def solve_step(self):
+#         dt = self.dt
+#         rhs_vector = (
+#             self.u0
+#             - (7 * dt / 4) * self.a * self.u0 * (self.a_first_order_matrix @ self.u0)
+#             + dt * self.u1 * (self.a_first_order_matrix @ self.u1)
+#             - (dt / 4) * self.u2 * (self.a_first_order_matrix @ self.u2)
+#             + (dt / 4) * (self.c_first_order_matrix) @ self.u1
+#             + (dt / 4) * (self.b_third_order_matrix) @ self.u1
+#             - (dt / 4) * self.bathymetry_term * self.u1
+#         )
+#         output = spla.spsolve(self.lhs_matrix, rhs_vector)
+#         self.u2 = self.u1.copy()
+#         self.u1 = self.u0.copy()
+#         self.u0 = output.reshape(self.n_x, 1).copy()
+#         return(output)
 
-    # is a diag matrix for each parameter really necessary???
-    # would work the exact same if there was just an element-wise mult.
-    # tomorrow: check dimensions on these so that they line up correctly.
     def solve_step(self):
         dt = self.dt
         rhs_vector = (
             self.u0
-            - (7 * dt / 4) * self.u0 * (self.a_first_order_matrix @ self.u0)
-            + dt * self.u1 * (self.a_first_order_matrix @ self.u1)
-            - (dt / 4) * self.u2 * (self.a_first_order_matrix @ self.u2)
-            + (dt / 4) * (self.c_first_order_matrix) @ self.u1
-            + (dt / 4) * (self.b_third_order_matrix) @ self.u1
+            - (7 * dt / 4) * self.a * self.u0 * (self.first_order_matrix @ self.u0)
+            + dt * self.a * self.u1 * (self.first_order_matrix @ self.u1)
+            - (dt / 4) * self.a * self.u2 * (self.first_order_matrix @ self.u2)
+            + (dt / 4) * self.c * (self.first_order_matrix @ self.u1)
+            + (dt / 4) * self.b * (self.third_order_matrix @ self.u1)
             - (dt / 4) * self.bathymetry_term * self.u1
         )
         output = spla.spsolve(self.lhs_matrix, rhs_vector)

@@ -4,10 +4,9 @@ from context import vvert
 
 
 vertical_test = vvert.VVerticalMode(
-    dx=1500, start_x=0, end_x=150_000, dz0=0.25, start_z0=0, end_z0=250,
+    dx=1500, start_x=0, end_x=150_000, dz0=0.5, start_z0=0, end_z0=250,
     n_interp=200, rho_0=1000
 )
-
 vertical_test.compute_bathymetry(vertical_test.x_grid * 5e-4)
 vertical_test.compute_density("lamb-yan-1")
 vertical_test.compute_parameters()
