@@ -46,10 +46,10 @@ test.set_lhs_matrix()
 # run the solver
 u = np.zeros([test.n_x, test.n_t])
 for i in range(test.n_t):
-    if (i % int(0.1 * test.n_t)) == 0:
-        print(f"Simulation {100 * i / test.n_t:.1f} % complete.")
+    print(f"\rIteration {i + 1:5} / {test.n_t}", end="")
     u[:, i] = test.solve_step()
 
+print()
 # plot results
 xmesh, ymesh = np.meshgrid(test.x_grid, test.t_grid)
 plt.figure()

@@ -4,11 +4,11 @@ from context import vvert
 
 
 vertical_test = vvert.VVerticalMode(
-    dx=100, start_x=0, end_x=150000, dz0=1, start_z0=0, end_z0=500,
+    dx=1500, start_x=0, end_x=150_000, dz0=0.25, start_z0=0, end_z0=250,
     n_interp=50, rho_0=1000
 )
 
-vertical_test.compute_bathymetry(vertical_test.x_grid * 2e-3)
+vertical_test.compute_bathymetry(vertical_test.x_grid * 5e-4)
 vertical_test.compute_density("lamb-yan-1")
 vertical_test.compute_parameters()
 
@@ -30,15 +30,15 @@ plt.title("$q$ parameter")
 
 plt.subplot(223)
 plt.plot(
-    x_grid[x_subs_index]/1000, vertical_test.r01[x_subs_index], "o",
-    x_grid/1000, vertical_test.r01, "-",
+    x_grid[x_subs_index]/1000, vertical_test.beta[x_subs_index], "o",
+    x_grid/1000, vertical_test.beta, "-",
 )
 plt.title("$r_{01}$ parameter")
 
 plt.subplot(224)
 plt.plot(
-    x_grid[x_subs_index]/1000, vertical_test.r10[x_subs_index], "o",
-    x_grid/1000, vertical_test.r10, "-"
+    x_grid[x_subs_index]/1000, vertical_test.alpha[x_subs_index], "o",
+    x_grid/1000, vertical_test.alpha, "-"
 )
 plt.title("$r_{10}$ parameter")
 plt.show()

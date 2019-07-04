@@ -19,6 +19,7 @@ class Kdv(object):
         self.a = 0
         self.b = 0
         self.c = 0
+
         self.q = np.zeros(self.n_x)
         self.q_grad = np.zeros(self.n_x)
 
@@ -32,9 +33,9 @@ class Kdv(object):
         self.bathymetry_term = None
 
     def set_initial_condition(self, initial):
-        self.u0[:] = initial
-        self.u1[:] = initial
-        self.u2[:] = initial
+        self.u0 = initial.copy()
+        self.u1 = initial.copy()
+        self.u2 = initial.copy()
 
     def set_first_order_matrix(self):
         dx, n_x = self.dx, self.n_x
@@ -85,17 +86,16 @@ class Kdv(object):
         self.lhs_matrix = output
 
     def set_solve_matrices(self):
-        a_sp = sparse.diags(self.a, format="csr")
-        b_sp = sparse.diags(self.b, format="csr")
-        c_sp = sparse.diags(self.c, format="csr")
-        self.a_first_order_matrix = a_sp @ self.first_order_matrix
-        self.b_third_order_matrix = b_sp @ self.third_order_matrix
-        self.c_first_order_matrix = c_sp @ self.first_order_matrix
-        self.bathymetry_term = (self.c / self.q) * self.q_grad
+        self.a_first_order_matrix = (self.first_order_matrix.T * self.a).T
+        self.b_third_order_matrix = (self.third_order_matrix.T * self.b).T
+        self.c_first_order_matrix = (self.first_order_matrix.T * self.c).T
+        self.bathymetry_term = np.array(
+            (self.c / self.q) * self.q_grad, ndmin=2
+        ).T
 
     # is a diag matrix for each parameter really necessary???
     # would work the exact same if there was just an element-wise mult.
-    # tomorrow: check dimensions on these so that they line up nicely.
+    # tomorrow: check dimensions on these so that they line up correctly.
     def solve_step(self):
         dt = self.dt
         rhs_vector = (
@@ -105,11 +105,10 @@ class Kdv(object):
             - (dt / 4) * self.u2 * (self.a_first_order_matrix @ self.u2)
             + (dt / 4) * (self.c_first_order_matrix) @ self.u1
             + (dt / 4) * (self.b_third_order_matrix) @ self.u1
-            - (dt / 4) * self.bathymetry_term.reshape(self.n_x, 1) * self.u1
+            - (dt / 4) * self.bathymetry_term * self.u1
         )
-        print(rhs_vector.shape)
-        output = spla.spsolve(self.lhs_matrix, rhs_vector).reshape(self.n_x)
-        self.u2 = self.u1
-        self.u1 = self.u0
-        self.u0 = output
-        return output
+        output = spla.spsolve(self.lhs_matrix, rhs_vector)
+        self.u2 = self.u1.copy()
+        self.u1 = self.u0.copy()
+        self.u0 = output.reshape(self.n_x, 1).copy()
+        return(output)

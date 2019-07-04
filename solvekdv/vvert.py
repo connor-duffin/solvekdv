@@ -128,7 +128,7 @@ class VVerticalMode(object):
         f_c = interpolate.interp1d(x_grid[x_subs_index], c_temp)
         f_beta = interpolate.interp1d(x_grid[x_subs_index], beta_temp)
         f_alpha = interpolate.interp1d(x_grid[x_subs_index], alpha_temp)
-        f_q = interpolate.interp1d(x_grid[x_subs_index], q_temp)
+        f_q = interpolate.interp1d(x_grid[x_subs_index], q_temp, kind="cubic")
 
         self.c = f_c(x_grid)
         self.beta = f_beta(x_grid)
