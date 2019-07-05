@@ -23,7 +23,7 @@ vert.compute_bathymetry(vert.x_grid * 5e-4)
 vert.compute_density("lamb-yan-1")
 vert.compute_parameters()
 
-# plot all of the parameters: these should be smooth
+# plot all of the parameters: these should be smooth functions
 x_grid = vert.x_grid
 plt.subplot(231)
 plt.plot(
@@ -50,8 +50,11 @@ plt.plot(
 plt.title("$\\beta$ parameter")
 
 plt.subplot(235)
-plt.plot((vert.c / vert.q) * vert.q_grad)
+plt.plot(
+    x_grid / 1000, (vert.c / vert.q) * vert.q_grad, "-"
+)
 plt.title("$c Q_x / Q$ parameter")
+
 plt.show()
 
 # set up the Kdv object
@@ -75,12 +78,10 @@ test.q = np.array(vert.q, ndmin=2).T
 test.q_grad = np.array(vert.q_grad, ndmin=2).T
 test.bathymetry_term = (2 * test.c / test.q) * test.q_grad  # 2c q_x / q
 
-
 # set all the matrices
 test.set_first_order_matrix()
 test.set_third_order_matrix()
 test.set_lhs_matrix()
-test.set_solve_matrices()
 
 u = np.zeros((test.n_x, test.n_t))
 for i in range(test.n_t):

@@ -1,5 +1,3 @@
-
-
 import numpy as np
 import scipy.sparse as sparse
 import scipy.sparse.linalg as spla
@@ -9,8 +7,8 @@ class Kdv(object):
     def __init__(self, dt, dx, start_x, end_x, start_t, end_t):
         self.dt = dt
         self.dx = dx
-        self.x_grid = np.arange(start_x, end_x + dx, dx)
-        self.t_grid = np.arange(start_t, end_t + dt, dt)
+        self.x_grid = np.arange(start_x, end_x, dx)
+        self.t_grid = np.arange(start_t, end_t, dt)
         self.n_x = len(self.x_grid)
         self.n_t = len(self.t_grid)
         self.u0 = np.zeros((self.n_x, 1))
@@ -73,10 +71,10 @@ class Kdv(object):
     def set_lhs_matrix(self):
         dt = self.dt
         diag = np.array(
-            1 - (3 * dt / 4) * self.q_grad * (self.c / self.q)
+            1 - (3 * dt / 4) * self.bathymetry_term
         ).flatten()
         output = (
-            sparse.diags(diag, format="csr")
+            sparse.diags(diag, format="coo")
             + (3 * dt / 4) * (
                 self.first_order_matrix.multiply(self.c)
             )
