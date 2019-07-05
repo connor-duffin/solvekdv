@@ -1,11 +1,3 @@
-"""
-================================
-KdV IMEX --- Lamb's formulation
-================================
-
-This solves the KdV equation using my own Implicit-Explicit routine, as in
-Durran and Blossey (2012).
-"""
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -26,44 +18,42 @@ print(
 )
 
 # set simulation vars, initial conditions, and parameters
-test = kdv.Kdv(
+soln = kdv.Kdv(
     dt=10, dx=50, start_x=-150000, end_x=150000,
     start_t=0, end_t=24 * 60**2
 )
-test.set_initial_condition(
-    np.array(- 20 * (1/4) * (1 + np.tanh((test.x_grid + 20000) / 2000))
-    * (1 - np.tanh(test.x_grid / 2000)), ndmin=2).T
+soln.set_initial_condition(
+    np.array(
+        - 20 * (1/4) * (1 + np.tanh((soln.x_grid + 20000) / 2000))
+        * (1 - np.tanh(soln.x_grid / 2000)), ndmin=2
+    ).T
 )
-test.set_kdv_parameters(
-    a=vertical.alpha,
-    b=vertical.beta,
-    c=vertical.c
-)
-test.set_first_order_matrix()
-test.set_third_order_matrix()
-test.set_lhs_matrix()
+
+soln.a = vertical.alpha
+soln.b = vertical.beta
+soln.c = vertical.c
+
+soln.set_first_order_matrix()
+soln.set_third_order_matrix()
+soln.set_lhs_matrix()
 
 # run the solver
-u = np.zeros([test.n_x, test.n_t])
-for i in range(test.n_t):
-    print(f"\rIteration {i + 1:5} / {test.n_t}", end="")
-    u[:, i] = test.solve_step()
+u = np.zeros((soln.n_x, soln.n_t))
+for i in range(soln.n_t):
+    print(f"\rIteration {i + 1:5} / {soln.n_t}", end="")
+    u[:, i] = soln.solve_step()
 
 print()
+
 # plot results
-xmesh, ymesh = np.meshgrid(test.x_grid, test.t_grid)
+xmesh, ymesh = np.meshgrid(soln.x_grid, soln.t_grid)
+
 plt.figure()
-plt.pcolormesh(xmesh, ymesh, u.transpose(), cmap="viridis_r")
+plt.pcolormesh(xmesh, ymesh, u.transpose(), cmap="RdBu_r")
 plt.colorbar()
 plt.xlabel("x")
 plt.ylabel("t")
 plt.title(
-    "KdV, ($a$, $b$, $c$)=(%g, %g, %g)" % (test.a, test.b, test.c)
+    f"KdV, ($a$, $b$, $c$)=({soln.a:.5f}, {soln.b:.5f}, {soln.c:.5f})"
 )
-plt.show()
-
-
-plt.plot(test.x_grid, u[:, 1000])
-plt.plot(test.x_grid, u[:, 2000])
-plt.plot(test.x_grid, u[:, 3000])
 plt.show()
