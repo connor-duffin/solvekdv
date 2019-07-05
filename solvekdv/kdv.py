@@ -11,9 +11,11 @@ class Kdv(object):
         self.t_grid = np.arange(start_t, end_t, dt)
         self.n_x = len(self.x_grid)
         self.n_t = len(self.t_grid)
+
         self.u0 = np.zeros((self.n_x, 1))
         self.u1 = np.zeros((self.n_x, 1))
         self.u2 = np.zeros((self.n_x, 1))
+
         self.a = 0
         self.b = 0
         self.c = 0
@@ -26,9 +28,6 @@ class Kdv(object):
         self.u0 = initial.copy()
         self.u1 = initial.copy()
         self.u2 = initial.copy()
-
-    def set_kdv_parameters(self, a, b, c):
-        self.a, self.b, self.c = a, b, c
 
     def set_first_order_matrix(self):
         dx, n_x = self.dx, self.n_x
