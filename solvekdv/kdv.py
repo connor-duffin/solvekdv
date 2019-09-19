@@ -109,8 +109,8 @@ class Kdv(object):
         b = self.b
         c = self.c
         return(
-
             sparse.eye(n_x)
+            + 1e-8 * sparse.eye(n_x)
             + a * (dt / (2 * dx)) * sparse.diags(
                 diagonals=[
                     u[-1],
@@ -131,16 +131,20 @@ class Kdv(object):
         u = self.u0.copy()
         epsilon = 1e6
         i = 0
+        # print(u_prev)
         while (epsilon >= tol and i < max_iter):
-            jacobian = self._im_euler_jacobian_lhs(u)
+            jacobian = self._im_euler_jacobian_lhs(u.flatten())
             f = self._im_euler_lhs(u, u_prev)
             s = spla.spsolve(jacobian, -f)
             u += s
             i += 1
             epsilon = np.sqrt(np.sum(s ** 2))
 
-    def _solve_step_im_euler(self):
+        return(u)
+
+    def solve_step_im_euler(self):
         u = self._newton_im_euler()
         self.u2 = self.u1.copy()
         self.u1 = self.u0.copy()
         self.u0 = u.copy()
+        return(u)
