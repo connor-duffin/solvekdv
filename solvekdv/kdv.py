@@ -34,8 +34,8 @@ class Kdv(object):
         output = (1 / (2*dx)) * sparse.diags(
             diagonals=[
                 1,
-                np.full(self.n_x - 1, -1),
-                np.full(self.n_x - 1, 1),
+                np.full(n_x - 1, -1),
+                np.full(n_x - 1, 1),
                 -1
             ],
             offsets=[-(n_x - 1), -1, 1, (n_x - 1)],

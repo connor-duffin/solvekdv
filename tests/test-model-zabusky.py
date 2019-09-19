@@ -5,10 +5,10 @@ from context import kdv
 
 
 test = kdv.Kdv(
-    dt=0.01, dx=0.01, start_x=0, end_x=1, start_t=0, end_t=10
+    dt=0.01, dx=0.01, start_x=0, end_x=2, start_t=0, end_t=5
 )
 test.set_initial_condition(
-    np.array(np.cos(2 * np.pi * test.x_grid), ndmin=2).T
+    np.array(np.cos(np.pi * test.x_grid), ndmin=2).T
 )
 test.a = 1
 test.b = 0.022**2
@@ -26,8 +26,8 @@ print()
 
 xmesh, ymesh = np.meshgrid(test.x_grid, test.t_grid)
 
-plt.figure()
-plt.pcolormesh(xmesh, ymesh, u.transpose(), cmap="RdBu_r")
+plt.figure(figsize=(6, 5))
+plt.pcolormesh(xmesh, ymesh, u.transpose())  # cmap="RdBu_r")
 plt.colorbar()
 plt.xlabel("x")
 plt.ylabel("t")

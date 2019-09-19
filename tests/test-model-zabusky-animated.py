@@ -9,7 +9,7 @@ test = kdv.Kdv(
     dt=0.001, dx=0.001, start_x=0, end_x=2, start_t=0, end_t=10
 )
 test.set_initial_condition(
-    np.array(np.cos(2 * np.pi * test.x_grid / 2), ndmin=2).T
+    np.array(np.cos(np.pi * test.x_grid), ndmin=2).T
 )
 
 test.a = 1
@@ -49,6 +49,6 @@ def animate(i):
 
 
 anim = animation.FuncAnimation(
-    fig, animate, init_func=init, frames=20000, interval=1, blit=True
+    fig, animate, init_func=init, frames=10000, interval=1, blit=True
 )
 plt.show()
