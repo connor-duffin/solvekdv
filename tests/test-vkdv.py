@@ -1,6 +1,7 @@
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from context import vvert
 from context import vkdv
@@ -14,13 +15,25 @@ from context import vkdv
 # start_z0 = 0
 # end_z0 = 250 m
 # 200 eigenvalue points
-vert = vvert.VVerticalMode(
-    dx=10, start_x=0, end_x=150_000, dz0=0.5, start_z0=0, end_z0=250,
-    n_eigen=200, rho_0=1000
-)
+bathymetry = pd.DataFrame(pd.read_csv(
+    "data/nws-bathymetry-5km.csv",
+    names=["x", "depth"]
+))
+x = np.asarray(bathymetry.x)
+depth = np.asarray(bathymetry.depth)
 
-vert.compute_bathymetry(vert.x_grid * 5e-4)
-vert.compute_density("lamb-yan-1")
+vert = vvert.VVerticalMode(
+    dx=10,
+    start_x=0,
+    end_x=x[-1],
+    dz0=0.5,
+    start_z0=0,
+    end_z0=-depth[0],
+    n_eigen=50,
+    rho_0=1000
+)
+vert.bathymetry = -np.interp(vert.x_grid, x, depth)
+vert.compute_density("dht")
 vert.compute_parameters()
 
 # plot all of the parameters: these should be smooth functions
@@ -30,36 +43,31 @@ plt.plot(
     x_grid/1000, vert.c, "-"
 )
 plt.title("$c$ parameter")
-
 plt.subplot(232)
 plt.plot(
     x_grid/1000, vert.q, "-"
 )
 plt.title("$q$ parameter")
-
 plt.subplot(233)
 plt.plot(
     x_grid/1000, vert.alpha, "-"
 )
 plt.title("$\\alpha$ parameter")
-
 plt.subplot(234)
 plt.plot(
     x_grid/1000, vert.beta, "-",
 )
 plt.title("$\\beta$ parameter")
-
 plt.subplot(235)
 plt.plot(
     x_grid / 1000, (vert.c / vert.q) * vert.q_grad, "-"
 )
 plt.title("$c Q_x / Q$ parameter")
-
 plt.show()
 
 # set up the Kdv object
 test = vkdv.Kdv(
-    dt=20, dx=10, start_x=0, end_x=150_000, start_t=0, end_t=24 * 60**2
+    dt=15, dx=50, start_x=0, end_x=150_000, start_t=0, end_t=24 * 60**2
 )
 test.set_initial_condition(
     np.array(

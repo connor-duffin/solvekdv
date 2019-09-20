@@ -30,9 +30,6 @@ class VVerticalMode(object):
         self.q = np.zeros((self.n_x, 1))
         self.q_grad = np.zeros((self.n_x, 1))
 
-    def compute_bathymetry(self, ocean_floor):
-        self.bathymetry = self.z0_grid[-1] - ocean_floor
-
     def compute_density(self, density="tanh"):
         z0_grid = self.z0_grid
         if density == "lamb-yan-1":
@@ -51,6 +48,25 @@ class VVerticalMode(object):
                 1027.31 - 10**(-4) * z / 9.81
                 - 1.696 * (1 + np.tanh((z - 200)/40))
             )
+        elif density == "dht":
+            self.density = (
+                1023.66 - 1.15 * (
+                    np.tanh((z0_grid + 72.58) / 49.12)
+                    + np.tanh((z0_grid + 153.44) / 49.98)
+                )
+            )
+            self.density_func = lambda z: (
+                1023.66 - 1.15 * (
+                    np.tanh((z + 72.58) / 49.12)
+                    + np.tanh((z + 153.44) / 49.98)
+                )
+            )
+            self.density_grad_func = lambda z: (
+                -1.15 * (
+                    (1 / np.cosh((z + 72.58) / 49.12))**2 / 49.12
+                    + (1 / np.cosh((z + 153.44) / 49.98))**2 / 49.98
+                )
+            )
         elif density == "tanh":
             self.density = (
                 (np.exp(z0_grid) - np.exp(-z0_grid))
@@ -61,7 +77,6 @@ class VVerticalMode(object):
             )
         else:
             logging.ERROR("Density not initialized.")
-        self.density_grad = np.gradient(self.density, self.dz0)
 
     def compute_parameters(self):
         dz = self.dz0
@@ -80,18 +95,18 @@ class VVerticalMode(object):
             z_grid_temp = np.linspace(0, bathymetry[i], n_eigen)
 
             # compute the density on the z-grid
-            density_temp = self.density_func(z_grid_temp)
-            density_grad_temp = np.gradient(density_temp)
+            # density_temp = self.density_func(z_grid_temp)
+            density_grad_temp = self.density_grad_func(z_grid_temp)
 
             # lhs of eigenvalue problem
-            second_diff_temp = - 1 / (dz**2) * (
+            second_diff_temp = -1 / (dz**2) * (
                 np.diag(np.full(n_eigen - 1, 1), k=-1)
                 + np.diag(np.full(n_eigen, -2), k=0)
                 + np.diag(np.full(n_eigen - 1, 1), k=1)
             )
             # rhs of eigenvalue problem
             scale = np.diag(
-                (- 9.81 / rho_0) * density_grad_temp
+                (9.81 / rho_0) * density_grad_temp
             )
 
             # solve eigenvalue problem using dense matrices, get first
