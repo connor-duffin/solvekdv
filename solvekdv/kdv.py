@@ -126,7 +126,7 @@ class Kdv(object):
             + c * dt * D_first
         )
 
-    def _newton_im_euler(self, tol=1e-8, max_iter=10_000):
+    def _newton_im_euler(self, tol=1e-10, max_iter=10_000):
         u_prev = self.u0.copy()
         u = self.u0.copy()
         epsilon = 1e6

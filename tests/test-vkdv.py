@@ -59,13 +59,12 @@ plt.show()
 
 # set up the Kdv object
 test = vkdv.Kdv(
-    dt=25, dx=10, start_x=0, end_x=150_000,
-    start_t=0, end_t=24 * 60**2
+    dt=20, dx=10, start_x=0, end_x=150_000, start_t=0, end_t=24 * 60**2
 )
 test.set_initial_condition(
     np.array(
         - 20 * (1/4) * (1 + np.tanh((test.x_grid - 10_000) / 2000))
-        * (1 - np.tanh((test.x_grid - 12_000) / 2000)),
+        * (1 - np.tanh((test.x_grid - 20_000) / 2000)),
         ndmin=2
     ).T
 )
@@ -92,7 +91,7 @@ for i in range(test.n_t):
         break
 
 fig = plt.figure()
-ax = plt.axes(xlim=(0, 60), ylim=(-50, 2.5))
+ax = plt.axes(xlim=(0, 60), ylim=(-300, 2.5))
 line, = plt.plot([], [])
 
 
