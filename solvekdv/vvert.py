@@ -79,7 +79,6 @@ class VVerticalMode(object):
             logging.ERROR("Density not initialized.")
 
     def compute_parameters(self):
-        dz = self.dz0
         rho_0 = self.rho_0
         n_eigen = self.n_eigen
 
@@ -93,9 +92,9 @@ class VVerticalMode(object):
         for i in range(self.n_x):
             # set the z-grid of interest
             z_grid_temp = np.linspace(0, bathymetry[i], n_eigen)
+            dz = z_grid_temp[1] - z_grid_temp[0]
 
             # compute the density on the z-grid
-            # density_temp = self.density_func(z_grid_temp)
             density_grad_temp = self.density_grad_func(z_grid_temp)
 
             # lhs of eigenvalue problem
@@ -106,7 +105,7 @@ class VVerticalMode(object):
             )
             # rhs of eigenvalue problem
             scale = np.diag(
-                (9.81 / rho_0) * density_grad_temp
+                -(9.81 / rho_0) * density_grad_temp
             )
 
             # solve eigenvalue problem using dense matrices, get first
@@ -114,7 +113,8 @@ class VVerticalMode(object):
                 second_diff_temp, b=scale, eigvals=(0, 0)
             )
             phi = np.ndarray.flatten(phi)
-            phi /= np.max(phi)
+            phi_max = phi[np.argmax(np.abs(phi))]  # get largest absolute value
+            phi /= phi_max
 
             # change this part
             phi_grad = np.gradient(phi, z_grid_temp[1] - z_grid_temp[0])
@@ -128,16 +128,19 @@ class VVerticalMode(object):
             # compute c, alpha, beta, q
             c_temp[i] = np.sqrt(1 / eigenvalue[0])
             alpha_temp[i] = (
-                (3 * c_temp[i] / 2) * (np.trapz(np.power(phi_grad, 3), dx=dz))
+                (3 * c_temp[i] / 2)
+                * (np.trapz(np.power(phi_grad, 3), dx=dz))
                 / np.trapz(np.power(phi_grad, 2), dx=dz)
             )
             beta_temp[i] = (
-                (c_temp[i] / 2) * np.trapz(np.power(phi, 2), dx=dz)
+                (c_temp[i] / 2)
+                * np.trapz(np.power(phi, 2), dx=dz)
                 / np.trapz(np.power(phi_grad, 2), dx=dz)
             )
             q_temp[i] = (
-                c_temp[0]**3 * np.trapz(np.power(phi0_grad, 2), dx=dz)
-                / (c_temp[i]**3 * np.trapz(np.power(phi_grad, 2), dx=dz))
+                (c_temp[i]**3 / c_temp[0]**3)
+                * np.trapz(np.power(phi_grad, 2), dx=dz)
+                / np.trapz(np.power(phi0_grad, 2), dx=dz)
             )
 
         self.c = c_temp

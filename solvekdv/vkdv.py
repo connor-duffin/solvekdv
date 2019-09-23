@@ -70,11 +70,12 @@ class Kdv(object):
 
     def set_lhs_matrix(self):
         dt = self.dt
-        diag = np.array(
-            1 - (3 * dt / 4) * self.bathymetry_term
-        ).flatten()
+        # diag = np.array(1  - (3 * dt / 4) * self.bathymetry_term).flatten()
+        print(self.b.shape)
+        print(self.c.shape)
+
         output = (
-            sparse.diags(diag, format="coo")
+            sparse.diags(np.full(self.n_x, 1), format="csr")
             + (3 * dt / 4) * (
                 self.first_order_matrix.multiply(self.c)
             )
@@ -82,6 +83,7 @@ class Kdv(object):
                 self.third_order_matrix.multiply(self.b)
             )
         )
+
         self.lhs_matrix = output
 
     def solve_step(self):
@@ -93,7 +95,7 @@ class Kdv(object):
             - (dt / 4) * self.a * self.u2 * (self.first_order_matrix @ self.u2)
             + (dt / 4) * self.c * (self.first_order_matrix @ self.u1)
             + (dt / 4) * self.b * (self.third_order_matrix @ self.u1)
-            - (dt / 4) * self.bathymetry_term * self.u1
+            # - (dt / 4) * self.bathymetry_term * self.u1
         )
         output = spla.spsolve(self.lhs_matrix, rhs_vector)
         self.u2 = self.u1.copy()

@@ -23,7 +23,7 @@ x = np.asarray(bathymetry.x)
 depth = np.asarray(bathymetry.depth)
 
 vert = vvert.VVerticalMode(
-    dx=10,
+    dx=40,
     start_x=0,
     end_x=x[-1],
     dz0=0.5,
@@ -39,36 +39,32 @@ vert.compute_parameters()
 # plot all of the parameters: these should be smooth functions
 x_grid = vert.x_grid
 plt.subplot(231)
-plt.plot(
-    x_grid/1000, vert.c, "-"
-)
+plt.plot(x_grid / 1000, vert.c)
 plt.title("$c$ parameter")
 plt.subplot(232)
-plt.plot(
-    x_grid/1000, vert.q, "-"
-)
+plt.plot(x_grid / 1000, vert.q)
 plt.title("$q$ parameter")
 plt.subplot(233)
-plt.plot(
-    x_grid/1000, vert.alpha, "-"
-)
+plt.plot(x_grid / 1000, vert.alpha)
 plt.title("$\\alpha$ parameter")
 plt.subplot(234)
-plt.plot(
-    x_grid/1000, vert.beta, "-",
-)
+plt.plot(x_grid / 1000, vert.beta)
 plt.title("$\\beta$ parameter")
 plt.subplot(235)
-plt.plot(
-    x_grid / 1000, (vert.c / vert.q) * vert.q_grad, "-"
-)
-plt.title("$c Q_x / Q$ parameter")
+plt.plot(x_grid / 1000, (2 * vert.c / vert.q) * vert.q_grad, "-")
+plt.title("$2 c Q_x / Q$ parameter")
 plt.show()
 
 # set up the Kdv object
 test = vkdv.Kdv(
-    dt=15, dx=50, start_x=0, end_x=150_000, start_t=0, end_t=24 * 60**2
+    dt=15, dx=40, start_x=0, end_x=x[-1], start_t=0, end_t=3 * 24 * 60**2
 )
+# test.set_initial_condition(
+#     np.array(
+#         20 * np.sin(2 * np.pi * test.x_grid / x[-1]),
+#         ndmin=2
+#     ).T
+# )
 test.set_initial_condition(
     np.array(
         - 20 * (1/4) * (1 + np.tanh((test.x_grid - 10_000) / 2000))
@@ -83,7 +79,7 @@ test.b = np.array(vert.beta, ndmin=2).T  # b = c / 2
 test.c = np.array(vert.c, ndmin=2).T
 test.q = np.array(vert.q, ndmin=2).T
 test.q_grad = np.array(vert.q_grad, ndmin=2).T
-test.bathymetry_term = (2 * test.c / test.q) * test.q_grad  # 2c q_x / q
+test.bathymetry_term = 2 * test.c / test.q * test.q_grad  # c q_x / 2 q
 
 # set all the matrices
 test.set_first_order_matrix()
@@ -99,7 +95,7 @@ for i in range(test.n_t):
         break
 
 fig = plt.figure()
-ax = plt.axes(xlim=(0, 60), ylim=(-300, 2.5))
+ax = plt.axes(xlim=(0, 100), ylim=(-300, 40))
 line, = plt.plot([], [])
 
 
@@ -114,6 +110,6 @@ def animate(i):
 
 
 anim = animation.FuncAnimation(
-    fig, animate, init_func=init, frames=8000, interval=2, blit=True
+    fig, animate, init_func=init, frames=test.n_t, interval=2, blit=True
 )
 plt.show()
