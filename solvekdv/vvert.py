@@ -21,62 +21,49 @@ class VVerticalMode(object):
         self.density_grad = None
         self.density_func = None
 
-        self.phi0 = np.zeros((self.n_x, self.n_z0))
-        self.phi0_grad = np.zeros((self.n_x, self.n_z0))
-        self.c = np.zeros((self.n_x, 1))
+        self.phi0 = np.zeros(self.n_z0)
+        self.phi0_grad = np.zeros(self.n_z0)
+        self.c = np.zeros(self.n_x)
 
-        self.alpha = np.zeros((self.n_x, 1))
-        self.beta = np.zeros((self.n_x, 1))
-        self.q = np.zeros((self.n_x, 1))
-        self.q_grad = np.zeros((self.n_x, 1))
+        self.alpha = np.zeros(self.n_x)
+        self.beta = np.zeros(self.n_x)
+        self.q = np.zeros(self.n_x)
+        self.q_grad = np.zeros(self.n_x)
 
-    def compute_density(self, density="tanh"):
+    def initialize_dht_density(self, params):
         z0_grid = self.z0_grid
-        if density == "lamb-yan-1":
-            self.density = (
-                1027.31 - 3.3955 * np.exp((z0_grid - 300) / 50)
+        if params is None or len(params) != 6:
+            params = np.array(
+                [1023.66, -1.15, 72.58, 49.12, 153.44, 49.98]
             )
-            self.density_func = lambda z: (
-                1027.31 - 3.3955 * np.exp((z - 300) / 50)
+        logging.WARN("Density profile initialized with defaults.")
+        self.density = (
+            params[0] + params[1] * (
+                np.tanh((z0_grid + params[2]) / params[3])
+                + np.tanh((z0_grid + params[4]) / params[5])
             )
-        elif density == "lamb-yan-2":
-            self.density = (
-                1027.31 - 10**(-4) * z0_grid / 9.81
-                - 1.696 * (1 + np.tanh((z0_grid - 200)/40))
+        )
+        self.density_func = lambda z: (
+            params[0] + params[1] * (
+                np.tanh((z + params[2]) / params[3])
+                + np.tanh((z + params[4]) / params[5])
             )
-            self.density_func = lambda z: (
-                1027.31 - 10**(-4) * z / 9.81
-                - 1.696 * (1 + np.tanh((z - 200)/40))
+        )
+        self.density_grad_func = lambda z: (
+            params[1] * (
+                (1 / np.cosh((z + params[2]) / params[3]))**2 / params[3]
+                + (1 / np.cosh((z + params[4]) / params[5]))**2 / params[5]
             )
-        elif density == "dht":
-            self.density = (
-                1023.66 - 1.15 * (
-                    np.tanh((z0_grid + 72.58) / 49.12)
-                    + np.tanh((z0_grid + 153.44) / 49.98)
-                )
-            )
-            self.density_func = lambda z: (
-                1023.66 - 1.15 * (
-                    np.tanh((z + 72.58) / 49.12)
-                    + np.tanh((z + 153.44) / 49.98)
-                )
-            )
-            self.density_grad_func = lambda z: (
-                -1.15 * (
-                    (1 / np.cosh((z + 72.58) / 49.12))**2 / 49.12
-                    + (1 / np.cosh((z + 153.44) / 49.98))**2 / 49.98
-                )
-            )
-        elif density == "tanh":
-            self.density = (
-                (np.exp(z0_grid) - np.exp(-z0_grid))
-                / (np.exp(z0_grid) + np.exp(-z0_grid))
-            )
-            self.density_func = lambda z: (
-                (np.exp(z) - np.exp(-z)) / (np.exp(z) + np.exp(-z))
-            )
-        else:
-            logging.ERROR("Density not initialized.")
+        )
+
+    def initialize_lamb_density(self):
+        z0_grid = self.z0_grid
+        self.density = (
+            1027.31 - 3.3955 * np.exp((z0_grid - 300) / 50)
+        )
+        self.density_func = lambda z: (
+            1027.31 - 3.3955 * np.exp((z - 300) / 50)
+        )
 
     def compute_parameters(self):
         rho_0 = self.rho_0

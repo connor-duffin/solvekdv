@@ -29,7 +29,7 @@ vert = vvert.VVerticalMode(
     dz0=0.5,
     start_z0=0,
     end_z0=-depth[0],
-    n_eigen=50,
+    n_eigen=200,
     rho_0=1000
 )
 vert.bathymetry = -np.interp(vert.x_grid, x, depth)
@@ -59,19 +59,19 @@ plt.show()
 test = vkdv.Kdv(
     dt=15, dx=40, start_x=0, end_x=x[-1], start_t=0, end_t=3 * 24 * 60**2
 )
-# test.set_initial_condition(
-#     np.array(
-#         20 * np.sin(2 * np.pi * test.x_grid / x[-1]),
-#         ndmin=2
-#     ).T
-# )
 test.set_initial_condition(
     np.array(
-        - 20 * (1/4) * (1 + np.tanh((test.x_grid - 10_000) / 2000))
-        * (1 - np.tanh((test.x_grid - 20_000) / 2000)),
+        20 * np.sin(2 * np.pi * test.x_grid / x[-1]),
         ndmin=2
     ).T
 )
+# test.set_initial_condition(
+#     np.array(
+#         - 20 * (1/4) * (1 + np.tanh((test.x_grid - 10_000) / 2000))
+#         * (1 - np.tanh((test.x_grid - 20_000) / 2000)),
+#         ndmin=2
+#     ).T
+# )
 
 # set all the coefficients
 test.a = np.array(vert.alpha, ndmin=2).T  # a = 3c / 2
@@ -79,7 +79,7 @@ test.b = np.array(vert.beta, ndmin=2).T  # b = c / 2
 test.c = np.array(vert.c, ndmin=2).T
 test.q = np.array(vert.q, ndmin=2).T
 test.q_grad = np.array(vert.q_grad, ndmin=2).T
-test.bathymetry_term = 2 * test.c / test.q * test.q_grad  # c q_x / 2 q
+test.bathymetry_term = 2 * (test.c / test.q) * test.q_grad  # 2 c q_x / q
 
 # set all the matrices
 test.set_first_order_matrix()
@@ -93,6 +93,8 @@ for i in range(test.n_t):
     if (np.isnan(np.sum(u[:, i]))):
         print(f"Simulation failed at i = {i}: nan's appeared. Exiting.")
         break
+
+print()
 
 fig = plt.figure()
 ax = plt.axes(xlim=(0, 100), ylim=(-300, 40))

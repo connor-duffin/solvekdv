@@ -71,8 +71,6 @@ class Kdv(object):
     def set_lhs_matrix(self):
         dt = self.dt
         # diag = np.array(1  - (3 * dt / 4) * self.bathymetry_term).flatten()
-        print(self.b.shape)
-        print(self.c.shape)
 
         output = (
             sparse.diags(np.full(self.n_x, 1), format="csr")
