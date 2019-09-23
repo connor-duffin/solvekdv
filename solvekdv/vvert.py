@@ -5,13 +5,13 @@ import scipy.linalg as la
 
 
 class VVerticalMode(object):
-    def __init__(self, dx, start_x, end_x, dz0, start_z0, end_z0,
+    def __init__(self, dx, x_start, x_end, dz0, z0_start, z0_end,
                  n_eigen, rho_0):
         self.dz0 = dz0
-        self.z0_grid = np.arange(start_z0, end_z0, dz0)
+        self.z0_grid = np.arange(z0_start, z0_end, dz0)
         self.n_z0 = len(self.z0_grid)
         self.dx = dx
-        self.x_grid = np.arange(start_x, end_x, dx)
+        self.x_grid = np.arange(x_start, x_end, dx)
         self.n_x = len(self.x_grid)
         self.n_eigen = n_eigen
 
@@ -30,13 +30,15 @@ class VVerticalMode(object):
         self.q = np.zeros(self.n_x)
         self.q_grad = np.zeros(self.n_x)
 
-    def initialize_dht_density(self, params):
+    def initialize_dht_density(self, params=None):
         z0_grid = self.z0_grid
-        if params is None or len(params) != 6:
+
+        if params is None:
             params = np.array(
                 [1023.66, -1.15, 72.58, 49.12, 153.44, 49.98]
             )
-        logging.WARN("Density profile initialized with defaults.")
+            logging.warning("Density profile initialized with defaults.")
+
         self.density = (
             params[0] + params[1] * (
                 np.tanh((z0_grid + params[2]) / params[3])

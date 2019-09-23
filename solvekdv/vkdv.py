@@ -4,13 +4,14 @@ import scipy.sparse.linalg as spla
 
 
 class Kdv(object):
-    def __init__(self, dt, dx, start_x, end_x, start_t, end_t):
+    def __init__(self, dt, dx, x_start, x_end, t_start, t_end):
         self.dt = dt
         self.dx = dx
-        self.x_grid = np.arange(start_x, end_x, dx)
-        self.t_grid = np.arange(start_t, end_t, dt)
+        self.x_grid = np.arange(x_start, x_end, dx)
+        self.t_grid = np.arange(t_start, t_end, dt)
         self.n_x = len(self.x_grid)
         self.n_t = len(self.t_grid)
+
         self.u0 = np.zeros((self.n_x, 1))
         self.u1 = np.zeros((self.n_x, 1))
         self.u2 = np.zeros((self.n_x, 1))

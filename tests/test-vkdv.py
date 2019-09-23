@@ -9,11 +9,8 @@ from context import vkdv
 
 # working parameters:
 # dx = 10
-# start_x = 0
-# end_x = 150 km
 # dz0 = 0.5
 # start_z0 = 0
-# end_z0 = 250 m
 # 200 eigenvalue points
 bathymetry = pd.DataFrame(pd.read_csv(
     "data/nws-bathymetry-5km.csv",
@@ -24,16 +21,16 @@ depth = np.asarray(bathymetry.depth)
 
 vert = vvert.VVerticalMode(
     dx=40,
-    start_x=0,
-    end_x=x[-1],
+    x_start=0,
+    x_end=x[-1],
     dz0=0.5,
-    start_z0=0,
-    end_z0=-depth[0],
+    z0_start=0,
+    z0_end=-depth[0],
     n_eigen=200,
     rho_0=1000
 )
 vert.bathymetry = -np.interp(vert.x_grid, x, depth)
-vert.compute_density("dht")
+vert.initialize_dht_density()
 vert.compute_parameters()
 
 # plot all of the parameters: these should be smooth functions
@@ -57,7 +54,7 @@ plt.show()
 
 # set up the Kdv object
 test = vkdv.Kdv(
-    dt=15, dx=40, start_x=0, end_x=x[-1], start_t=0, end_t=3 * 24 * 60**2
+    dt=15, dx=40, x_start=0, x_end=x[-1], t_start=0, t_end=3 * 24 * 60**2
 )
 test.set_initial_condition(
     np.array(
