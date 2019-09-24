@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from context import kdv
+from solvekdv import kdv
 
 
 test = kdv.Kdv(
-    dt=0.01, dx=0.01, start_x=0, end_x=1, start_t=0, end_t=10
+    dt=0.01, dx=0.01, x_start=0, x_end=1, t_start=0, t_end=10
 )
 test.set_initial_condition(
     np.array(np.cos(2 * np.pi * test.x_grid), ndmin=2).T
@@ -15,12 +15,12 @@ test.b = 0.022**2
 test.c = 0
 test.set_first_order_matrix()
 test.set_third_order_matrix()
-test.set_lhs_matrix()
+test.set_imex_lhs_matrix()
 
 u = np.zeros((test.n_x, test.n_t))
 for i in range(test.n_t):
     print(f"\rIteration {i + 1:5} / {test.n_t}", end="")
-    u[:, i] = test.solve_step()
+    u[:, i] = test.solve_step_imex()
 
 print()
 

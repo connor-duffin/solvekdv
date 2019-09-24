@@ -7,11 +7,6 @@ from solvekdv import vvert
 from solvekdv import vkdv
 
 
-# working parameters:
-# dx = 10
-# dz0 = 0.5
-# start_z0 = 0
-# 200 eigenvalue points
 bathymetry = pd.DataFrame(pd.read_csv(
     "data/nws-bathymetry-5km.csv",
     names=["x", "depth"]
@@ -71,8 +66,8 @@ test.set_initial_condition(
 # )
 
 # set all the coefficients
-test.a = np.array(vert.alpha, ndmin=2).T  # a = 3c / 2
-test.b = np.array(vert.beta, ndmin=2).T  # b = c / 2
+test.alpha = np.array(vert.alpha, ndmin=2).T  # a = 3c / 2
+test.beta = np.array(vert.beta, ndmin=2).T  # b = c / 2
 test.c = np.array(vert.c, ndmin=2).T
 test.q = np.array(vert.q, ndmin=2).T
 test.q_grad = np.array(vert.q_grad, ndmin=2).T

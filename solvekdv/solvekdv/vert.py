@@ -16,10 +16,10 @@ class VerticalMode(object):
         self.grad_density = None
         self.phi = None
         self.phi_grad = None
-        self.c = None
 
         self.alpha = None
         self.beta = None
+        self.c = None
 
     def compute_density(self, density="tanh"):
         z_grid = self.z_grid
@@ -98,7 +98,8 @@ class VerticalMode(object):
     def compute_alpha(self):
         phi_grad = self.phi_grad
         self.alpha = (
-            (3 * self.c / 2) * np.trapz(np.power(phi_grad, 3), dx=self.dz)
+            (3 * self.c / 2)
+            * np.trapz(np.power(phi_grad, 3), dx=self.dz)
             / np.trapz(np.power(phi_grad, 2), dx=self.dz)
         )
 
@@ -106,6 +107,7 @@ class VerticalMode(object):
         phi = self.phi
         phi_grad = self.phi_grad
         self.beta = (
-            (self.c / 2) * np.trapz(np.power(phi, 2), dx=self.dz)
+            (self.c / 2)
+            * np.trapz(np.power(phi, 2), dx=self.dz)
             / np.trapz(np.power(phi_grad, 2), dx=self.dz)
         )

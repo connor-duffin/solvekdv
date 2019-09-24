@@ -1,17 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from context import kdv
+from solvekdv import kdv
 
 
 test = kdv.Kdv(
-    dt=0.001, dx=0.01, start_x=0, end_x=2, start_t=0, end_t=10
+    dt=0.001, dx=0.01, x_start=0, x_end=2, t_start=0, t_end=10
 )
 test.set_initial_condition(
     np.cos(np.pi * test.x_grid)
 )
-test.a = 1
-test.b = 0.022**2
+test.alpha = 1
+test.beta = 0.022**2
 test.c = 0
 test.set_first_order_matrix()
 test.set_third_order_matrix()
@@ -34,7 +34,6 @@ plt.colorbar()
 plt.xlabel("x")
 plt.ylabel("t")
 plt.title(
-    f"KdV, ($a$, $b$, $c$)=({test.a:.5f}, {test.b:.5f}, {test.c:.5f})"
+    f"KdV, (alpha, beta, c)=({test.alpha:.5f}, {test.beta:.5f}, {test.c:.5f})"
 )
-plt.savefig("implicit.png", dpi=500)
-plt.close()
+plt.show()

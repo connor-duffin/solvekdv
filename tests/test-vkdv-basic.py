@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from context import vvert
-from context import vkdv
+from solvekdv import vvert
+from solvekdv import vkdv
 
 
 bathymetry = pd.DataFrame(pd.read_csv(
@@ -33,7 +33,7 @@ test = vkdv.Kdv(
     x_start=0,
     x_end=x[-1],
     t_start=0,
-    t_end=3 * 24 * 60**2
+    t_end=24 * 60**2
 )
 test.set_initial_condition(
     np.array(
@@ -42,8 +42,8 @@ test.set_initial_condition(
     ).T
 )
 # set all the coefficients
-test.a = np.array(vert.alpha, ndmin=2).T  # a = 3c / 2
-test.b = np.array(vert.beta, ndmin=2).T  # b = c / 2
+test.alpha = np.array(vert.alpha, ndmin=2).T  # a = 3c / 2
+test.beta = np.array(vert.beta, ndmin=2).T  # b = c / 2
 test.c = np.array(vert.c, ndmin=2).T
 test.q = np.array(vert.q, ndmin=2).T
 test.q_grad = np.array(vert.q_grad, ndmin=2).T

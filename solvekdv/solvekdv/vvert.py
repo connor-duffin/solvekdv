@@ -64,7 +64,10 @@ class VVerticalMode(object):
             1027.31 - 3.3955 * np.exp((z0_grid - 300) / 50)
         )
         self.density_func = lambda z: (
-            1027.31 - 3.3955 * np.exp((z - 300) / 50)
+            1027.31 - 3.3955 * np.exp(-(z + 300) / 50)
+        )
+        self.density_grad_func = lambda z: (
+            -3.3955 * np.exp(-(z + 300) / 50) / 50
         )
 
     def compute_parameters(self):

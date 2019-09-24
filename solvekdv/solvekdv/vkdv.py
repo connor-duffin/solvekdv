@@ -16,21 +16,17 @@ class Kdv(object):
         self.u1 = np.zeros((self.n_x, 1))
         self.u2 = np.zeros((self.n_x, 1))
 
-        self.a = None
-        self.b = None
+        self.alpha = None
+        self.beta = None
         self.c = None
 
         self.q = None
         self.q_grad = None
+        self.bathymetry_term = None
 
         self.first_order_matrix = np.zeros((self.n_x, self.n_x))
         self.third_order_matrix = np.zeros((self.n_x, self.n_x))
         self.lhs_matrix = np.zeros((self.n_x, self.n_x))
-
-        self.a_first_order_matrix = None
-        self.b_third_order_matrix = None
-        self.c_first_order_matrix = None
-        self.bathymetry_term = None
 
     def set_initial_condition(self, initial):
         self.u0 = initial.copy()
@@ -79,7 +75,7 @@ class Kdv(object):
                 self.first_order_matrix.multiply(self.c)
             )
             + (3 * dt / 4) * (
-                self.third_order_matrix.multiply(self.b)
+                self.third_order_matrix.multiply(self.beta)
             )
         )
 
@@ -87,13 +83,14 @@ class Kdv(object):
 
     def solve_step(self):
         dt = self.dt
+        alpha, beta, c = self.alpha, self.beta, self.c
         rhs_vector = (
             self.u0
-            - (7 * dt / 4) * self.a * self.u0 * (self.first_order_matrix @ self.u0)
-            + dt * self.a * self.u1 * (self.first_order_matrix @ self.u1)
-            - (dt / 4) * self.a * self.u2 * (self.first_order_matrix @ self.u2)
-            + (dt / 4) * self.c * (self.first_order_matrix @ self.u1)
-            + (dt / 4) * self.b * (self.third_order_matrix @ self.u1)
+            - (7 * dt / 4) * alpha * self.u0 * (self.first_order_matrix @ self.u0)
+            + dt * alpha * self.u1 * (self.first_order_matrix @ self.u1)
+            - (dt / 4) * alpha * self.u2 * (self.first_order_matrix @ self.u2)
+            + (dt / 4) * c * (self.first_order_matrix @ self.u1)
+            + (dt / 4) * beta * (self.third_order_matrix @ self.u1)
             # - (dt / 4) * self.bathymetry_term * self.u1
         )
         output = spla.spsolve(self.lhs_matrix, rhs_vector)

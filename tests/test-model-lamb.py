@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from context import kdv
-from context import vert
+from solvekdv import kdv
+from solvekdv import vert
 
 
 # solve the vertical mode problem
@@ -19,8 +19,8 @@ print(
 
 # set simulation vars, initial conditions, and parameters
 soln = kdv.Kdv(
-    dt=10, dx=50, start_x=-150000, end_x=150000,
-    start_t=0, end_t=24 * 60**2
+    dt=10, dx=50, x_start=-150000, x_end=150000,
+    t_start=0, t_end=24 * 60**2
 )
 soln.set_initial_condition(
     np.array(
@@ -29,19 +29,19 @@ soln.set_initial_condition(
     ).T
 )
 
-soln.a = vertical.alpha
-soln.b = vertical.beta
+soln.alpha = vertical.alpha
+soln.beta = vertical.beta
 soln.c = vertical.c
 
 soln.set_first_order_matrix()
 soln.set_third_order_matrix()
-soln.set_lhs_matrix()
+soln.set_imex_lhs_matrix()
 
 # run the solver
 u = np.zeros((soln.n_x, soln.n_t))
 for i in range(soln.n_t):
     print(f"\rIteration {i + 1:5} / {soln.n_t}", end="")
-    u[:, i] = soln.solve_step()
+    u[:, i] = soln.solve_step_imex()
 
 print()
 
@@ -54,6 +54,6 @@ plt.colorbar()
 plt.xlabel("x")
 plt.ylabel("t")
 plt.title(
-    f"KdV, ($a$, $b$, $c$)=({soln.a:.5f}, {soln.b:.5f}, {soln.c:.5f})"
+    f"KdV, ($\alpha$, $\beta$, $c$)=({soln.alpha:.5f}, {soln.beta:.5f}, {soln.c:.5f})"
 )
 plt.show()

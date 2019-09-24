@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from context import vert
+from solvekdv import vert
 
 
 vertical_test = vert.VerticalMode(0.1, 0, 200, 1000)
@@ -11,8 +11,8 @@ vertical_test.compute_alpha()
 vertical_test.compute_beta()
 
 print(
-    f"r10: {vertical_test.alpha:.4f}\n"
-    + f"r01: {vertical_test.beta:.4f}\n"
+    f"alpha: {vertical_test.alpha:.4f}\n"
+    + f"beta: {vertical_test.beta:.4f}\n"
     + f"c:   {vertical_test.c:.4f}\n"
 )
 

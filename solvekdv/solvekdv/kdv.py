@@ -16,8 +16,8 @@ class Kdv(object):
         self.u1 = np.zeros((self.n_x, 1))
         self.u2 = np.zeros((self.n_x, 1))
 
-        self.a = None
-        self.b = None
+        self.alpha = None
+        self.beta = None
         self.c = None
 
         self.first_order_matrix = np.zeros((self.n_x, self.n_x))
@@ -64,19 +64,19 @@ class Kdv(object):
     def set_imex_lhs_matrix(self):
         output = (
             sparse.identity(self.n_x, format="csr")
-            + self.b * (3 * self.dt / 4) * self.third_order_matrix
+            + self.beta * (3 * self.dt / 4) * self.third_order_matrix
             + self.c * (3 * self.dt / 4) * self.first_order_matrix
         )
         self.lhs_matrix = output
 
     def solve_step_imex(self):
-        a, b, c, dt = self.a, self.b, self.c, self.dt
+        alpha, beta, c, dt = self.alpha, self.beta, self.c, self.dt
         rhs_vector = (
             self.u0
-            - a * (7 * dt / 4) * self.u0 * (self.first_order_matrix @ self.u0)
-            + a * dt * self.u1 * (self.first_order_matrix @ self.u1)
-            - a * (dt / 4) * self.u2 * (self.first_order_matrix @ self.u2)
-            - b * (dt / 4) * self.third_order_matrix @ self.u1
+            - alpha * (7 * dt / 4) * self.u0 * (self.first_order_matrix @ self.u0)
+            + alpha * dt * self.u1 * (self.first_order_matrix @ self.u1)
+            - alpha * (dt / 4) * self.u2 * (self.first_order_matrix @ self.u2)
+            - beta * (dt / 4) * self.third_order_matrix @ self.u1
             - c * (dt / 4) * self.first_order_matrix @ self.u1
         )
         output = spla.spsolve(self.lhs_matrix, rhs_vector)
@@ -87,15 +87,15 @@ class Kdv(object):
 
     def _im_euler_lhs(self, u, u_prev):
         dt = self.dt
-        a = self.a
-        b = self.b
+        alpha = self.alpha
+        beta = self.beta
         c = self.c
         D_first = self.first_order_matrix
         D_third = self.third_order_matrix
         return(
             u - u_prev
-            + dt * a * np.multiply(u, D_first @ u)
-            + dt * b * D_third @ u
+            + dt * alpha * np.multiply(u, D_first @ u)
+            + dt * beta * D_third @ u
             + dt * c * D_first @ u
         )
 
@@ -105,13 +105,13 @@ class Kdv(object):
         dt = self.dt
         dx = self.dx
         n_x = self.n_x
-        a = self.a
-        b = self.b
+        alpha = self.alpha
+        beta = self.beta
         c = self.c
         return(
             sparse.eye(n_x)
             + 1e-8 * sparse.eye(n_x)
-            + a * (dt / (2 * dx)) * sparse.diags(
+            + alpha * (dt / (2 * dx)) * sparse.diags(
                 diagonals=[
                     u[-1],
                     -u[1:],
@@ -122,7 +122,7 @@ class Kdv(object):
                 offsets=[-(n_x - 1), -1, 0, 1, n_x - 1],
                 format="csc"
             )
-            + b * dt * D_third
+            + beta * dt * D_third
             + c * dt * D_first
         )
 
