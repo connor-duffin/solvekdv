@@ -6,8 +6,8 @@ from solvekdv import vert
 
 
 # solve the vertical mode problem
-vertical = vert.VerticalMode(0.1, 0, 500, 1000)
-vertical.compute_density("lamb-yan-1")
+vertical = vert.VerticalMode(z_start=0, z_end=-500, n_z=200, rho_0=1000)
+vertical.initialize_lamb_density()
 vertical.find_vertical_mode()
 vertical.compute_alpha()
 vertical.compute_beta()
