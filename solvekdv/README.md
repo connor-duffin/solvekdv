@@ -1,9 +1,9 @@
-# solvekdv: Korteweg-de Vries IMEX solver
+# solvekdv: Korteweg-de Vries solver
 Connor P. Duffin
 
-My own implementation of a KdV solver using the Implicit-Explicit method of
-Durrand & Blossey (2012). See the python notebooks in `docs` to see how
-the equations that need to be solved.
+Solve the KdV equation using either implicit or IMEX methods. IMEX a la Durran
+& Blossey (2012). See the python notebooks in `docs` to see equations that are
+solved.
 
 Requires:
 
