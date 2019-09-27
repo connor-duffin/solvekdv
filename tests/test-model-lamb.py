@@ -19,8 +19,12 @@ print(
 
 # set simulation vars, initial conditions, and parameters
 soln = kdv.Kdv(
-    dt=10, dx=50, x_start=-150000, x_end=150000,
-    t_start=0, t_end=24 * 60**2
+    dt=10,
+    dx=50,
+    x_start=-150000,
+    x_end=150000,
+    t_start=0,
+    t_end=24 * 60**2
 )
 soln.set_initial_condition(
     np.array(
@@ -54,6 +58,6 @@ plt.colorbar()
 plt.xlabel("x")
 plt.ylabel("t")
 plt.title(
-    f"KdV, ($\alpha$, $\beta$, $c$)=({soln.alpha:.5f}, {soln.beta:.5f}, {soln.c:.5f})"
+    f"KdV, (alpha, beta, c)=({soln.alpha:.5f}, {soln.beta:.5f}, {soln.c:.5f})"
 )
 plt.show()

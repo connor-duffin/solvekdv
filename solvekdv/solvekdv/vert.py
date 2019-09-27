@@ -8,7 +8,6 @@ import scipy.sparse.linalg as spla
 
 class VerticalMode(object):
     def __init__(self, z_start, z_end, n_z, rho_0):
-        print("hello from future")
         self.z_grid = np.linspace(z_start, z_end, n_z)
         self.dz = self.z_grid[1] - self.z_grid[0]
         self.n_z = n_z

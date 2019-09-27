@@ -94,7 +94,7 @@ class Kdv(object):
         D_third = self.third_order_matrix
         return(
             u - u_prev
-            + dt * alpha * np.multiply(u, D_first @ u)
+            + dt * alpha * np.multiply(u, (D_first @ u).T).T
             + dt * beta * D_third @ u
             + dt * c * D_first @ u
         )

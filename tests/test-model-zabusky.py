@@ -25,13 +25,14 @@ for i in range(test.n_t):
 print()
 
 xmesh, ymesh = np.meshgrid(test.x_grid, test.t_grid)
-
-plt.figure(figsize=(6, 5))
-plt.pcolormesh(xmesh, ymesh, u.transpose())
-plt.colorbar()
-plt.xlabel("x")
-plt.ylabel("t")
-plt.title(
-    f"KdV, (alpha, beta, c)=({test.alpha:.5f}, {test.beta:.5f}, {test.c:.5f})"
+fig, ax = plt.subplots(figsize=(6, 5))
+im = ax.pcolormesh(xmesh, ymesh, u.T)
+plt.colorbar(im, ax=ax)
+ax.set_xlabel("x")
+ax.set_ylabel("t")
+ax.set_title(
+    f"KdV, (alpha, beta, c) = "
+    + f"({test.alpha:.5f}, {test.beta:.5f}, {test.c:.5f})\n"
+    + "IMEX method"
 )
-plt.show()
+fig.savefig("outputs/zk-imex.png", dpi=500)

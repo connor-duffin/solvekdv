@@ -5,7 +5,7 @@ from solvekdv import kdv
 
 
 test = kdv.Kdv(
-    dt=0.001, dx=0.01, x_start=0, x_end=2, t_start=0, t_end=10
+    dt=0.01, dx=0.01, x_start=0, x_end=2, t_start=0, t_end=10
 )
 test.set_initial_condition(
     np.cos(np.pi * test.x_grid)
@@ -27,13 +27,14 @@ for i in range(test.n_t):
 print()
 
 xmesh, ymesh = np.meshgrid(test.x_grid, test.t_grid)
-
-plt.figure(figsize=(6, 5))
-plt.pcolormesh(xmesh, ymesh, u.transpose())
-plt.colorbar()
-plt.xlabel("x")
-plt.ylabel("t")
-plt.title(
-    f"KdV, (alpha, beta, c)=({test.alpha:.5f}, {test.beta:.5f}, {test.c:.5f})"
+fig, ax = plt.subplots(figsize=(6, 5))
+im = ax.pcolormesh(xmesh, ymesh, u.T)
+plt.colorbar(im, ax=ax)
+ax.set_xlabel("x")
+ax.set_ylabel("t")
+ax.set_title(
+    f"KdV, (alpha, beta, c) = "
+    + f"({test.alpha:.5f}, {test.beta:.5f}, {test.c:.5f})\n"
+    + "Implicit method"
 )
-plt.show()
+fig.savefig("outputs/zk-implicit.png", dpi=500)
